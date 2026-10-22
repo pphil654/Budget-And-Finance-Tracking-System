@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Projects - Project Track PH</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f6f9;
+            color: #212529;
+        }
+
+        /* =========================
+           NAVIGATION BAR
+           ========================= */
+
+        .navbar {
+            background-color: #212529;
+            color: white;
+            padding: 15px 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .brand {
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 8px 14px;
+            border: 1px solid white;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-button:hover {
+            background-color: white;
+            color: #212529;
+        }
+
+        /* =========================
+           CONTAINER
+           ========================= */
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 35px auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            margin: 0 0 5px 0;
+        }
+
+        .page-title p {
+            margin: 0;
+            color: #6c757d;
+        }
+
+        /* =========================
+           BUTTONS
+           ========================= */
+
+        .btn {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+        }
+
+        /* =========================
+           PROJECT CARD
+           ========================= */
+
+        .project-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.10);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f1f3f5;
+            text-align: left;
+            padding: 12px;
+
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+
+            background-color: #0dcaf0;
+            color: #212529;
+
+            font-size: 12px;
+        }
+
+        .no-projects {
+            text-align: center;
+            color: #6c757d;
+            padding: 30px;
+        }
+
+        /* =========================
+           RESPONSIVE
+           ========================= */
+
+        @media (max-width: 700px) {
+
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .navbar-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .container {
+                width: 94%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVIGATION BAR
+         ========================= -->
+
+    <nav class="navbar">
+
+        <div class="navbar-left">
+
+            <a href="/dashboard"
+               class="brand">
+
+                PROJECT TRACK PH
+
+            </a>
+
+        </div>
+
+        <a href="/logout"
+           class="nav-button">
+
+            Logout
+
+        </a>
+
+    </nav>
+
+
+    <!-- =========================
+         MAIN CONTENT
+         ========================= -->
+
+    <div class="container">
+
+        <div class="page-header">
+
+            <div class="page-title">
+
+                <h2>
+                    Project Management
+                </h2>
+
+                <p>
+                    View and manage registered projects.
+                </p>
+
+            </div>
+
+            <a href="/projects/new"
+               class="btn btn-primary">
+
+                + Add Project
+
+            </a>
+
+        </div>
+
+
+        <!-- =========================
+             PROJECT TABLE
+             ========================= -->
+
+        <div class="project-card">
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Project Code
+                            </th>
+
+                            <th>
+                                Project Name
+                            </th>
+
+                            <th>
+                                Allocated Budget
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="project : ${projects}">
+
+                            <td th:text="${project.id}">
+                                1
+                            </td>
+
+                            <td th:text="${project.projectCode}">
+                                PRJ-2026-001
+                            </td>
+
+                            <td th:text="${project.projectName}">
+                                Sample Project
+                            </td>
+
+                            <td>
+
+                                ₱<span
+                                    th:text="${#numbers.formatDecimal(project.allocatedBudget, 1, 'COMMA', 2, 'POINT')}">
+
+                                    0.00
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="badge"
+                                      th:text="${project.status}">
+
+                                    Planned
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <a th:href="@{/projects/edit/{id}(id=${project.id})}"
+                                   class="btn btn-edit">
+
+                                    Edit
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+
+                        <tr th:if="${projects.empty}">
+
+                            <td colspan="6"
+                                class="no-projects">
+
+                                No projects found.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

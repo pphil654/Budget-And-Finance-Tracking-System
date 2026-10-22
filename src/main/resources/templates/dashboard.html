@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Budget and Financial Tracking system - Dashboard</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f6f9;
+            color: #212529;
+        }
+
+        /* =========================
+           NAVIGATION BAR
+           ========================= */
+
+        .navbar {
+            background-color: #212529;
+            color: white;
+            padding: 15px 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .brand {
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .system-description {
+            color: #dddddd;
+            font-size: 14px;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            text-align: right;
+            font-size: 14px;
+        }
+
+        .user-info small {
+            color: #cccccc;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 8px 14px;
+            border: 1px solid #ffffff;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-button:hover {
+            background-color: white;
+            color: #212529;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            margin: 0 0 5px 0;
+        }
+
+        .page-title p {
+            margin: 0;
+            color: #6c757d;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            border-radius: 10px;
+            padding: 22px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+        }
+
+        .card small {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .blue {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .green {
+            background-color: #198754;
+            color: white;
+        }
+
+        .red {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .cyan {
+            background-color: #0dcaf0;
+            color: #212529;
+        }
+
+        .yellow {
+            background-color: #ff4f00;
+            color: #212529;
+        }
+
+        .bottom-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .project-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.10);
+        }
+
+        .project-card h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f1f3f5;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background-color: #0dcaf0;
+            color: #212529;
+            font-size: 12px;
+        }
+
+        .alert-badge {
+            display: inline-block;
+            margin-top: 7px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .normal {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            color: #664d03;
+        }
+
+        .critical {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        .overspending {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .no-projects {
+            text-align: center;
+            color: #6c757d;
+            padding: 25px;
+        }
+
+        @media (max-width: 900px) {
+
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .navbar-right {
+                width: 100%;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .cards,
+            .bottom-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .navbar-right {
+                flex-wrap: wrap;
+            }
+
+            .container {
+                width: 94%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <nav class="navbar">
+
+        <div class="navbar-left">
+
+            <a href="/dashboard"
+               class="brand">
+
+                Budget and Financial Tracking System
+
+            </a>
+
+            <span class="system-description">
+
+                overview
+
+            </span>
+
+        </div>
+
+        <div class="navbar-right">
+
+            <!-- PROJECTS BUTTON -->
+
+            <a href="/projects"
+               class="nav-button">
+
+                Projects
+
+            </a>
+
+            <!-- TRANSACTIONS BUTTON -->
+
+            <a href="/transactions"
+               class="nav-button">
+
+                Transactions
+
+            </a>
+
+            <div class="user-info">
+
+                <div>
+
+                    Welcome,
+
+                    <strong th:text="${fullName}">
+                        User
+                    </strong>
+
+                </div>
+
+                <small>
+
+                    Role:
+
+                    <span th:text="${role}">
+                        USER
+                    </span>
+
+                </small>
+
+            </div>
+
+            <a href="/logout"
+               class="nav-button">
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <div class="container">
+
+        <div class="page-title">
+
+            <h2>
+                Financial Overview Dashboard
+            </h2>
+
+            <p>
+                Monitor project budgets, expenses, and remaining funds.
+            </p>
+
+        </div>
+
+
+        <!-- =========================
+             SUMMARY CARDS
+             ========================= -->
+
+        <div class="cards">
+
+            <div class="card blue">
+
+                <small>
+                    Total Projects
+                </small>
+
+                <h3 th:text="${totalProjects}">
+                    0
+                </h3>
+
+            </div>
+
+
+            <div class="card green">
+
+                <small>
+                    Total Allocated Budget
+                </small>
+
+                <h3>
+
+                    ₱<span th:text="${#numbers.formatDecimal(totalBudget, 1, 'COMMA', 2, 'POINT')}">
+                        0.00
+                    </span>
+
+                </h3>
+
+            </div>
+
+
+            <div class="card red">
+
+                <small>
+                    Total Expenses
+                </small>
+
+                <h3>
+
+                    ₱<span th:text="${#numbers.formatDecimal(totalExpenses, 1, 'COMMA', 2, 'POINT')}">
+                        0.00
+                    </span>
+
+                </h3>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             BOTTOM SUMMARY CARDS
+             ========================= -->
+
+        <div class="bottom-cards">
+
+            <div class="card cyan">
+
+                <small>
+                    Remaining Funds
+                </small>
+
+                <h3>
+
+                    ₱<span th:text="${#numbers.formatDecimal(remainingFunds, 1, 'COMMA', 2, 'POINT')}">
+                        0.00
+                    </span>
+
+                </h3>
+
+            </div>
+
+
+            <div class="card yellow">
+
+                <small>
+                    Budget Utilization
+                </small>
+
+                <h3>
+
+                    <span th:text="${#numbers.formatDecimal(budgetUtilization, 1, 'COMMA', 2, 'POINT')}">
+                        0.00
+                    </span>%
+
+                </h3>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             PROJECT LIST
+             ========================= -->
+
+        <div class="project-card">
+
+            <h3>
+                Active Projects List
+            </h3>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Code
+                            </th>
+
+                            <th>
+                                Project Name
+                            </th>
+
+                            <th>
+                                Allocated Budget
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Budget Alert
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="project : ${projects}">
+
+                            <td th:text="${project.projectCode}">
+                                PRJ-001
+                            </td>
+
+                            <td th:text="${project.projectName}">
+                                Sample Project
+                            </td>
+
+                            <td>
+
+                                ₱<span th:text="${#numbers.formatDecimal(project.allocatedBudget, 1, 'COMMA', 2, 'POINT')}">
+                                    0.00
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="badge"
+                                      th:text="${project.status}">
+
+                                    Planned
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span
+                                    th:if="${projectAlerts[project.id] == 'NORMAL'}"
+                                    class="alert-badge normal">
+
+                                    NORMAL
+
+                                </span>
+
+                                <span
+                                    th:if="${projectAlerts[project.id] == 'WARNING'}"
+                                    class="alert-badge warning">
+
+                                    WARNING
+
+                                </span>
+
+                                <span
+                                    th:if="${projectAlerts[project.id] == 'CRITICAL'}"
+                                    class="alert-badge critical">
+
+                                    CRITICAL
+
+                                </span>
+
+                                <span
+                                    th:if="${projectAlerts[project.id] == 'OVERSPENDING'}"
+                                    class="alert-badge overspending">
+
+                                    OVERSPENDING
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+
+                        <tr th:if="${projects.empty}">
+
+                            <td colspan="5"
+                                class="no-projects">
+
+                                No projects found in database.
+
+                </td>
+
+                 </tr>
+           </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

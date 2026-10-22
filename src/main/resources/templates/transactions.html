@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Transactions - Project Track PH</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+</head>
+
+<body class="bg-light">
+
+    <!-- Navigation -->
+
+    <nav class="navbar navbar-dark bg-dark">
+
+        <div class="container-fluid px-4">
+
+            <a class="navbar-brand fw-bold"
+               href="/dashboard">
+
+                Budget and Financial Tracking System
+
+            </a>
+
+            <div class="d-flex align-items-center">
+
+                <span class="text-white me-3">
+
+                    Welcome,
+                    <strong th:text="${fullName}">
+                        User
+                    </strong>
+
+                </span>
+
+                <a href="/logout"
+                   class="btn btn-outline-light btn-sm">
+
+                    Logout
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+
+    <div class="container my-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+
+                <h3>
+                    Financial Transactions
+                </h3>
+
+                <p class="text-muted mb-0">
+                    Manage project income and expenses.
+                </p>
+
+            </div>
+
+            <a href="/transactions/new"
+               class="btn btn-primary">
+
+                + Add Transaction
+
+            </a>
+
+        </div>
+
+
+        <!-- Transactions Table -->
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-striped table-hover">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>ID</th>
+
+                                <th>Project</th>
+
+                                <th>Type</th>
+
+                                <th>Amount</th>
+
+                                <th>Description</th>
+
+                                <th>Date</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <tr th:each="transaction : ${transactions}">
+
+                                <td th:text="${transaction.id}">
+                                    1
+                                </td>
+
+                                <td>
+
+                                    <span th:text="${transaction.project.projectCode}">
+                                        PRJ-001
+                                    </span>
+
+                                    <br>
+
+                                    <small class="text-muted"
+                                           th:text="${transaction.project.projectName}">
+                                        Sample Project
+                                    </small>
+
+                                </td>
+
+                                <td>
+
+                                    <span th:if="${transaction.transactionType == 'INCOME'}"
+                                          class="badge bg-success">
+
+                                        INCOME
+
+                                    </span>
+
+                                    <span th:if="${transaction.transactionType == 'EXPENSE'}"
+                                          class="badge bg-danger">
+
+                                        EXPENSE
+
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    ₱<span th:text="${#numbers.formatDecimal(transaction.amount, 1, 'COMMA', 2, 'POINT')}">
+                                        0.00
+                                    </span>
+
+                                </td>
+
+                                <td th:text="${transaction.description}">
+                                    Transaction description
+                                </td>
+
+                                <td th:text="${transaction.transactionDate}">
+                                    2026-10-09
+                                </td>
+
+                            </tr>
+
+
+                            <!-- No Transactions -->
+
+                            <tr th:if="${transactions.empty}">
+
+                                <td colspan="6"
+                                    class="text-center text-muted py-4">
+
+                                    No transactions found.
+
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

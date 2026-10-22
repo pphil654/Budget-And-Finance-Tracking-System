@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Add Project - Project Track PH</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f6f9;
+            color: #212529;
+        }
+
+        /* =========================
+           NAVIGATION BAR
+           ========================= */
+
+        .navbar {
+            background-color: #212529;
+            color: white;
+            padding: 15px 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 8px 14px;
+            border: 1px solid white;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-button:hover {
+            background-color: white;
+            color: #212529;
+        }
+
+        /* 
+           CONTAINER to ha
+           */
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+        }
+
+        .page-title h2 {
+            margin: 0 0 5px 0;
+        }
+
+        .page-title p {
+            margin: 0;
+            color: #6c757d;
+        }
+
+        /* =
+           FORM CARD basat yung form neto
+          */
+
+        .form-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.10);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px 12px;
+
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+
+            font-size: 14px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #0d6efd;
+        }
+
+        .form-help {
+            display: block;
+            margin-top: 5px;
+            color: #6c757d;
+            font-size: 12px;
+        }
+
+        /* 
+           BUTTONS siya
+            */
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5c636a;
+        }
+
+        /* 
+           RESPONSIVE nung ano basta yon
+           */
+
+        @media (max-width: 600px) {
+
+            .navbar {
+                padding: 15px 20px;
+            }
+
+            .container {
+                width: 94%;
+                margin: 25px auto;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                text-align: center;
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVIGATION BAR
+          -->
+
+    <nav class="navbar">
+
+        <a href="/dashboard"
+           class="brand">
+
+            PROJECT TRACK PH
+
+        </a>
+
+        <a href="/logout"
+           class="nav-button">
+
+            Logout
+
+        </a>
+
+    </nav>
+
+
+    <!-- =========================
+         MAIN CONTENT
+         ========================= -->
+
+    <div class="container">
+
+        <div class="page-title">
+
+            <h2>
+                Add New Project
+            </h2>
+
+            <p>
+                Create a new project and assign its initial budget.
+            </p>
+
+        </div>
+
+
+        <!-- =========================
+             PROJECT FORM
+             ========================= -->
+
+        <div class="form-card">
+
+            <form action="/projects/save"
+                  method="post"
+                  th:object="${project}">
+
+                <!-- PROJECT CODE -->
+
+                <div class="form-group">
+
+                    <label for="projectCode">
+                        Project Code
+                    </label>
+
+                    <input type="text"
+                           id="projectCode"
+                           th:field="*{projectCode}"
+                           placeholder="Example: PRJ-2026-002"
+                           required>
+
+                    <small class="form-help">
+                        Enter a unique code for the project.
+                    </small>
+
+                </div>
+
+
+                <!-- PROJECT NAME -->
+
+                <div class="form-group">
+
+                    <label for="projectName">
+                        Project Name
+                    </label>
+
+                    <input type="text"
+                           id="projectName"
+                           th:field="*{projectName}"
+                           placeholder="Enter project name"
+                           required>
+
+                </div>
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="form-group">
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea id="description"
+                              th:field="*{description}"
+                              placeholder="Enter project description"></textarea>
+
+                </div>
+
+
+                <!-- ALLOCATED BUDGET -->
+
+                <div class="form-group">
+
+                    <label for="allocatedBudget">
+                        Allocated Budget
+                    </label>
+
+                    <input type="number"
+                           id="allocatedBudget"
+                           th:field="*{allocatedBudget}"
+                           min="0"
+                           step="0.01"
+                           placeholder="0.00"
+                           required>
+
+                    <small class="form-help">
+                        Enter the initial budget allocated to this project.
+                    </small>
+
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div class="form-group">
+
+                    <label for="status">
+                        Project Status
+                    </label>
+
+                    <select id="status"
+                            th:field="*{status}">
+
+                        <option value="Planned">
+                            Planned
+                        </option>
+
+                        <option value="Ongoing">
+                            Ongoing
+                        </option>
+
+                        <option value="Completed">
+                            Completed
+                        </option>
+
+                        <option value="Cancelled">
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- BUTTONS -->
+
+                <div class="buttons">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Save Project
+
+                    </button>
+
+                    <a href="/dashboard"
+                       class="btn btn-secondary">
+
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
