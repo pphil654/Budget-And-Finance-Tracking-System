@@ -1,8 +1,11 @@
+
 package com.bfts.controller;
 
+import com.bfts.entity.Budget;
 import com.bfts.entity.Project;
-import com.bfts.repository.ProjectRepository;
+import com.bfts.repository.BudgetRepository;
 import com.bfts.repository.FinancialTransactionRepository;
+import com.bfts.repository.ProjectRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -24,53 +27,23 @@ public class DashboardController {
     private ProjectRepository projectRepository;
 
     @Autowired
+    private BudgetRepository budgetRepository;
+
+    @Autowired
     private FinancialTransactionRepository transactionRepository;
 
     @GetMapping("/dashboard")
-    public String showDashboard(
-            Model model,
-            HttpSession session) {
+    public String showDashboard(Model model, HttpSession session) {
 
-        // Check if user is logged in
+        // Check if the user is logged in.
         if (session.getAttribute("loggedInUserId") == null) {
             return "redirect:/login";
         }
 
-        // Get all projects
         List<Project> projects = projectRepository.findAll();
 
-        // Calculate total allocated budget
         BigDecimal totalBudget = BigDecimal.ZERO;
-
-        for (Project p : projects) {
-            if (p.getAllocatedBudget() != null) {
-                totalBudget = totalBudget.add(p.getAllocatedBudget());
-            }
-        }
-
-        // Get total expenses
-        BigDecimal totalExpenses =
-                transactionRepository.getTotalExpenses();
-
-        // Calculate remaining funds
-        BigDecimal remainingFunds =
-                totalBudget.subtract(totalExpenses);
-
-        // Calculate overall budget utilization
-        BigDecimal budgetUtilization = BigDecimal.ZERO;
-
-        if (totalBudget.compareTo(BigDecimal.ZERO) > 0) {
-
-            budgetUtilization = totalExpenses
-                    .divide(totalBudget, 4, RoundingMode.HALF_UP)
-                    .multiply(BigDecimal.valueOf(100));
-        }
-
-        /*
-         * ==========================================
-         * PROJECT BUDGET ALERTS
-         * ==========================================
-         */
+        BigDecimal remainingFunds = BigDecimal.ZERO;
 
         Map<Long, BigDecimal> projectExpenses = new HashMap<>();
         Map<Long, BigDecimal> projectUtilization = new HashMap<>();
@@ -78,82 +51,114 @@ public class DashboardController {
 
         for (Project project : projects) {
 
-            BigDecimal projectBudget =
-                    project.getAllocatedBudget();
+            BigDecimal allocatedBudget = project.getAllocatedBudget();
 
-            if (projectBudget == null) {
-                projectBudget = BigDecimal.ZERO;
+            if (allocatedBudget == null) {
+                allocatedBudget = BigDecimal.ZERO;
             }
 
-            BigDecimal expenses =
-                    transactionRepository
-                            .getTotalExpensesByProjectId(project.getId());
+            // Get the project's budget record.
+            Budget budget = budgetRepository
+                    .findByProjectId(project.getId())
+                    .orElse(null);
 
-            projectExpenses.put(project.getId(), expenses);
+            BigDecimal projectBudget = allocatedBudget;
+            BigDecimal projectRemainingBalance;
 
-            BigDecimal utilization = BigDecimal.ZERO;
+            if (budget != null) {
 
-            if (projectBudget.compareTo(BigDecimal.ZERO) > 0) {
+                if (budget.getTotalAllocated() != null) {
+                    projectBudget = budget.getTotalAllocated();
+                }
 
-                utilization = expenses
-                        .divide(
-                                projectBudget,
-                                4,
-                                RoundingMode.HALF_UP
-                        )
-                        .multiply(BigDecimal.valueOf(100));
-            }
+                projectRemainingBalance = budget.getRemainingBalance();
 
-            projectUtilization.put(
-                    project.getId(),
-                    utilization
-            );
-
-            /*
-             * Determine alert level
-             */
-
-            String alert;
-
-            if (utilization.compareTo(BigDecimal.valueOf(100)) >= 0) {
-
-                alert = "OVERSPENDING";
-
-            } else if (utilization.compareTo(BigDecimal.valueOf(90)) >= 0) {
-
-                alert = "CRITICAL";
-
-            } else if (utilization.compareTo(BigDecimal.valueOf(80)) >= 0) {
-
-                alert = "WARNING";
+                if (projectRemainingBalance == null) {
+                    projectRemainingBalance = BigDecimal.ZERO;
+                }
 
             } else {
 
+                // Calculate the remaining balance if no budget record exists.
+                BigDecimal expenses = transactionRepository
+                        .getTotalExpensesByProjectId(project.getId());
+
+                if (expenses == null) {
+                    expenses = BigDecimal.ZERO;
+                }
+
+                projectRemainingBalance = projectBudget.subtract(expenses);
+            }
+
+            totalBudget = totalBudget.add(projectBudget);
+            remainingFunds = remainingFunds.add(projectRemainingBalance);
+
+            // Get the project's total expenses.
+            BigDecimal expenses = transactionRepository
+                    .getTotalExpensesByProjectId(project.getId());
+
+            if (expenses == null) {
+                expenses = BigDecimal.ZERO;
+            }
+
+            projectExpenses.put(project.getId(), expenses);
+
+            // Calculate project budget utilization.
+            BigDecimal utilization = BigDecimal.ZERO;
+
+            if (projectBudget.compareTo(BigDecimal.ZERO) > 0) {
+                utilization = expenses
+                        .divide(projectBudget, 4, RoundingMode.HALF_UP)
+                        .multiply(BigDecimal.valueOf(100));
+            }
+
+            projectUtilization.put(project.getId(), utilization);
+
+            // Determine the project's budget alert.
+            String alert;
+
+            if (utilization.compareTo(BigDecimal.valueOf(100)) >= 0) {
+                alert = "OVERSPENDING";
+            } else if (utilization.compareTo(BigDecimal.valueOf(90)) >= 0) {
+                alert = "CRITICAL";
+            } else if (utilization.compareTo(BigDecimal.valueOf(80)) >= 0) {
+                alert = "WARNING";
+            } else {
                 alert = "NORMAL";
             }
 
-            projectAlerts.put(
-                    project.getId(),
-                    alert
-            );
+            projectAlerts.put(project.getId(), alert);
         }
 
-        // Send project information to dashboard
+        // Calculate all recorded expenses.
+        BigDecimal totalExpenses = transactionRepository.getTotalExpenses();
+
+        if (totalExpenses == null) {
+            totalExpenses = BigDecimal.ZERO;
+        }
+
+        // Calculate overall budget utilization.
+        BigDecimal budgetUtilization = BigDecimal.ZERO;
+
+        if (totalBudget.compareTo(BigDecimal.ZERO) > 0) {
+            budgetUtilization = totalExpenses
+                    .divide(totalBudget, 4, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+        }
+
+        // Send data to dashboard.html.
         model.addAttribute("projects", projects);
         model.addAttribute("totalProjects", projects.size());
 
-        // Send overall financial calculations
         model.addAttribute("totalBudget", totalBudget);
         model.addAttribute("totalExpenses", totalExpenses);
         model.addAttribute("remainingFunds", remainingFunds);
         model.addAttribute("budgetUtilization", budgetUtilization);
 
-        // Send project financial information
         model.addAttribute("projectExpenses", projectExpenses);
         model.addAttribute("projectUtilization", projectUtilization);
         model.addAttribute("projectAlerts", projectAlerts);
 
-        // Send logged-in user information
         model.addAttribute(
                 "username",
                 session.getAttribute("loggedInUsername")

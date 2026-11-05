@@ -1,0 +1,520 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports | Project Track PH</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 240px;
+            height: 100vh;
+            background: #ba181b;
+            color: white;
+            padding: 25px 18px;
+            overflow-y: auto;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: #f8d7d8;
+            margin-bottom: 35px;
+            line-height: 1.5;
+        }
+
+        .user-info {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow-wrap: anywhere;
+        }
+
+        .user-info p {
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar nav a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 13px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .main {
+            margin-left: 240px;
+            padding: 30px;
+            min-width: 0;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .topbar h1 {
+            font-size: 28px;
+            color: #222;
+        }
+
+        .topbar p {
+            margin-top: 7px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .export-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #ba181b;
+            color: white;
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s ease;
+        }
+
+        .export-btn:hover {
+            background: #8f1114;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-left: 5px solid #ba181b;
+            min-width: 0;
+        }
+
+        .summary-card h3 {
+            font-size: 13px;
+            color: #777;
+            font-weight: normal;
+            margin-bottom: 12px;
+        }
+
+        .summary-card .amount {
+            font-size: 23px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .summary-card .count {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .summary-card:nth-child(2) {
+            border-left-color: #e09f3e;
+        }
+
+        .summary-card:nth-child(3) {
+            border-left-color: #2a9d8f;
+        }
+
+        .summary-card:nth-child(4) {
+            border-left-color: #457b9d;
+        }
+
+        .report-section {
+            background: white;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 19px;
+        }
+
+        .section-header p {
+            color: #777;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .utilization-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        thead {
+            background: #f7f7f7;
+        }
+
+        th,
+        td {
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        th {
+            color: #555;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .utilization {
+            min-width: 120px;
+        }
+
+        .progress-track {
+            height: 7px;
+            width: 100%;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin-top: 7px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            background: #2a9d8f;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .status.normal {
+            background: #d8f3dc;
+            color: #237a3b;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.critical {
+            background: #ffe0b2;
+            color: #9a5700;
+        }
+
+        .status.overspending {
+            background: #f8d7da;
+            color: #a4161a;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #777;
+            padding: 30px;
+        }
+
+        .footer-note {
+            color: #888;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 1200px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 18px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar h1 {
+                font-size: 23px;
+            }
+
+            .report-section {
+                padding: 16px;
+            }
+
+            .export-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <div class="brand">Project Track PH</div>
+    <div class="subtitle">Budget and Financial Tracking System</div>
+
+    <div class="user-info">
+        <p>Logged in as:</p>
+        <strong th:text="${fullName != null ? fullName : 'User'}">User</strong>
+        <p th:text="${role != null ? role : 'Role'}">Role</p>
+    </div>
+
+    <nav>
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <a th:href="@{/projects}">Projects</a>
+        <a th:href="@{/transactions}">Transactions</a>
+        <a th:href="@{/reports}" class="active">Reports</a>
+        <a th:href="@{/logout}">Logout</a>
+    </nav>
+</aside>
+
+<main class="main">
+
+    <header class="topbar">
+        <div>
+            <h1>Financial Reports</h1>
+            <p>Overview of project budgets, expenses, and remaining funds.</p>
+        </div>
+
+        <a th:href="@{/reports/export}" class="export-btn">
+            &#8595; Export to CSV
+        </a>
+    </header>
+
+    <!-- Summary Cards -->
+    <section class="summary-grid">
+
+        <div class="summary-card">
+            <h3>Total Projects</h3>
+            <div class="count"
+                 th:text="${totalProjects != null ? totalProjects : 0}">0</div>
+        </div>
+
+        <div class="summary-card">
+            <h3>Total Allocated Budget</h3>
+            <div class="amount">
+                ₱<span th:text="${#numbers.formatDecimal(totalBudget, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <h3>Total Expenses</h3>
+            <div class="amount">
+                ₱<span th:text="${#numbers.formatDecimal(totalExpenses, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <h3>Remaining Funds</h3>
+            <div class="amount">
+                ₱<span th:text="${#numbers.formatDecimal(remainingFunds, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Overall Budget Utilization -->
+    <section class="report-section">
+
+        <div class="section-header">
+            <div>
+                <h2>Overall Budget Utilization</h2>
+                <p>Percentage of the total allocated budget already spent.</p>
+            </div>
+
+            <div class="utilization-value">
+                <span th:text="${#numbers.formatDecimal(overallUtilization, 1, 2)}">0.00</span>%
+            </div>
+        </div>
+
+        <div class="progress-track" style="height: 12px;">
+            <div class="progress-fill"
+                 th:style="|width: ${overallUtilization.doubleValue() > 100 ? 100 : (overallUtilization.doubleValue() < 0 ? 0 : overallUtilization.doubleValue())}%;|">
+            </div>
+        </div>
+
+        <p class="footer-note">
+            Utilization is calculated by dividing total expenses by total allocated budget and multiplying by 100.
+        </p>
+
+    </section>
+
+    <!-- Project Expense Summary -->
+    <section class="report-section">
+
+        <div class="section-header">
+            <div>
+                <h2>Project Expense Summary</h2>
+                <p>Budget and expense breakdown for each project.</p>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>Project Code</th>
+                    <th>Project Name</th>
+                    <th>Allocated Budget</th>
+                    <th>Total Expenses</th>
+                    <th>Remaining Funds</th>
+                    <th>Utilization</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="report : ${projectReports}">
+
+                    <td th:text="${report.projectCode}">PRJ-001</td>
+
+                    <td th:text="${report.projectName}">Sample Project</td>
+
+                    <td>
+                        ₱<span th:text="${#numbers.formatDecimal(report.budget, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </td>
+
+                    <td>
+                        ₱<span th:text="${#numbers.formatDecimal(report.expenses, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </td>
+
+                    <td>
+                        ₱<span th:text="${#numbers.formatDecimal(report.remainingBalance, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </td>
+
+                    <td class="utilization">
+                        <span th:text="${#numbers.formatDecimal(report.utilization, 1, 2)}">0.00</span>%
+
+                        <div class="progress-track">
+                            <div class="progress-fill"
+                                 th:style="|width: ${report.utilization.doubleValue() > 100 ? 100 : (report.utilization.doubleValue() < 0 ? 0 : report.utilization.doubleValue())}%;|">
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="status normal"
+                              th:if="${report.utilization.doubleValue() < 80}">
+                            NORMAL
+                        </span>
+
+                        <span class="status warning"
+                              th:if="${report.utilization.doubleValue() >= 80 and report.utilization.doubleValue() < 90}">
+                            WARNING
+                        </span>
+
+                        <span class="status critical"
+                              th:if="${report.utilization.doubleValue() >= 90 and report.utilization.doubleValue() < 100}">
+                            CRITICAL
+                        </span>
+
+                        <span class="status overspending"
+                              th:if="${report.utilization.doubleValue() >= 100}">
+                            OVERSPENDING
+                        </span>
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(projectReports)}">
+                    <td colspan="7" class="empty-state">
+                        No project reports available yet.
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <p class="footer-note">
+            Note: NORMAL means utilization is below 80%. WARNING means 80% to below 90%.
+            CRITICAL means 90% to below 100%. OVERSPENDING means expenses have reached or exceeded 100% of the allocated budget.
+        </p>
+
+    </section>
+
+</main>
+
+</body>
+</html>
