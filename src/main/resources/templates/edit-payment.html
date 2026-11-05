@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Payment | Project Track PH</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f5f7;
+            color: #333;
+        }
+
+        .header {
+            background: #ba181b;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .header p {
+            margin-top: 5px;
+            font-size: 13px;
+            color: #f5dada;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        h2 {
+            margin-bottom: 8px;
+            font-size: 25px;
+        }
+
+        .subtitle {
+            margin-bottom: 25px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .error-message {
+            background: #fdeaea;
+            border: 1px solid #f1bcbc;
+            color: #9b1c1c;
+        }
+
+        .success-message {
+            background: #e8f7ed;
+            border: 1px solid #b7e4c7;
+            color: #216e39;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d5d5d5;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #ba181b;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-save {
+            background: #ba181b;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #921316;
+        }
+
+        .btn-back {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .btn-back:hover {
+            background: #d9dcdf;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 18px;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 0 12px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="header">
+    <div>
+        <h1>Project Track PH</h1>
+        <p>Budget and Financial Tracking System</p>
+    </div>
+</header>
+
+<main class="container">
+    <section class="card">
+
+        <h2>Edit Payment Record</h2>
+
+        <p class="subtitle">
+            Update the payment information and save your changes.
+        </p>
+
+        <!-- Error message -->
+        <div th:if="${errorMessage}"
+             class="message error-message"
+             role="alert"
+             th:text="${errorMessage}">
+            An error occurred.
+        </div>
+
+        <!-- Success message -->
+        <div th:if="${successMessage}"
+             class="message success-message"
+             role="status"
+             th:text="${successMessage}">
+            Payment updated successfully.
+        </div>
+
+        <form th:action="@{/payments/update/{id}(id=${payment.id})}"
+              method="post">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="projectId">Project *</label>
+
+                    <select id="projectId"
+                            name="projectId"
+                            required>
+
+                        <option value="">-- Select Project --</option>
+
+                        <option th:each="project : ${projects}"
+                                th:value="${project.id}"
+                                th:text="${project.projectName}"
+                                th:selected="${payment.project != null and project.id == payment.project.id}">
+                            Project Name
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Amount (₱) *</label>
+
+                    <input type="number"
+                           id="amount"
+                           name="amount"
+                           min="0.01"
+                           step="0.01"
+                           th:value="${payment.amount}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentDate">Payment Date *</label>
+
+                    <input type="date"
+                           id="paymentDate"
+                           name="paymentDate"
+                           th:value="${payment.paymentDate}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Method *</label>
+
+                    <select id="paymentMethod"
+                            name="paymentMethod"
+                            required>
+
+                        <option value="CASH"
+                                th:selected="${payment.paymentMethod == 'CASH'}">
+                            Cash
+                        </option>
+
+                        <option value="BANK_TRANSFER"
+                                th:selected="${payment.paymentMethod == 'BANK_TRANSFER'}">
+                            Bank Transfer
+                        </option>
+
+                        <option value="GCASH"
+                                th:selected="${payment.paymentMethod == 'GCASH'}">
+                            GCash
+                        </option>
+
+                        <option value="CHECK"
+                                th:selected="${payment.paymentMethod == 'CHECK'}">
+                            Check
+                        </option>
+
+                        <option value="OTHER"
+                                th:selected="${payment.paymentMethod == 'OTHER'}">
+                            Other
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Payment Status *</label>
+
+                    <select id="status"
+                            name="status"
+                            required>
+
+                        <option value="PENDING"
+                                th:selected="${payment.status == 'PENDING'}">
+                            Pending
+                        </option>
+
+                        <option value="COMPLETED"
+                                th:selected="${payment.status == 'COMPLETED'}">
+                            Completed
+                        </option>
+
+                        <option value="CANCELLED"
+                                th:selected="${payment.status == 'CANCELLED'}">
+                            Cancelled
+                        </option>
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="referenceNumber">Reference Number</label>
+
+                    <input type="text"
+                           id="referenceNumber"
+                           name="referenceNumber"
+                           maxlength="100"
+                           th:value="${payment.referenceNumber}"
+                           placeholder="Optional reference number">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="description">Description</label>
+
+                    <textarea id="description"
+                              name="description"
+                              maxlength="500"
+                              th:text="${payment.description}"
+                              placeholder="Optional payment description"></textarea>
+                </div>
+
+            </div>
+
+            <div class="actions">
+
+                <button type="submit" class="btn btn-save">
+                    Save Changes
+                </button>
+
+                <a th:href="@{/payments}" class="btn btn-back">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+</main>
+
+</body>
+</html>
