@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments | Project Track PH</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f5f7;
+            color: #333;
+        }
+
+        .header {
+            background: #ba181b;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header h1 {
+            font-size: 25px;
+        }
+
+        .header p {
+            font-size: 13px;
+            margin-top: 5px;
+            color: #f5dada;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .user-info {
+            text-align: right;
+            font-size: 13px;
+        }
+
+        .user-info strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .page-heading h2 {
+            font-size: 25px;
+            color: #252525;
+        }
+
+        .page-heading p {
+            margin-top: 6px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .btn {
+            display: inline-block;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .btn-back {
+            background: white;
+            color: #ba181b;
+            border: 1px solid #ba181b;
+        }
+
+        .btn-back:hover {
+            background: #fff0f0;
+        }
+
+        .btn-primary {
+            background: #ba181b;
+            color: white;
+        }
+
+        .btn-primary:hover,
+        .btn-search:hover {
+            background: #921316;
+        }
+
+        .btn-edit {
+            background: #f0ad4e;
+            color: #222;
+            padding: 7px 11px;
+        }
+
+        .btn-edit:hover {
+            background: #e49a30;
+        }
+
+        .btn-delete {
+            background: #ba181b;
+            color: white;
+            padding: 7px 11px;
+        }
+
+        .btn-delete:hover {
+            background: #921316;
+        }
+
+        .btn-search {
+            background: #ba181b;
+            color: white;
+        }
+
+        .btn-reset {
+            background: #e9ecef;
+            color: #333;
+            border: 1px solid #d5d5d5;
+        }
+
+        .btn-reset:hover {
+            background: #d9dde1;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 22px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-left: 5px solid #ba181b;
+        }
+
+        .summary-card h3 {
+            color: #777;
+            font-size: 13px;
+            font-weight: normal;
+            margin-bottom: 12px;
+        }
+
+        .summary-card .number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #252525;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .section-title {
+            font-size: 19px;
+            margin-bottom: 20px;
+            color: #252525;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #444;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d5d5d5;
+            border-radius: 5px;
+            font-size: 14px;
+            background: white;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #ba181b;
+        }
+
+        textarea {
+            min-height: 85px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+        }
+
+        .message {
+            padding: 13px 16px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .success-message {
+            background: #e8f7ed;
+            border: 1px solid #b9e6c7;
+            color: #236b3b;
+        }
+
+        .error-message {
+            background: #fdeaea;
+            border: 1px solid #f1bcbc;
+            color: #9b1c1c;
+        }
+
+        /* Search and filter */
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-description {
+            color: #777;
+            font-size: 13px;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .results-info {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        thead {
+            background: #ba181b;
+            color: white;
+        }
+
+        th {
+            padding: 14px 12px;
+            text-align: left;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            background: #fff2cc;
+            color: #8a6500;
+        }
+
+        .status-completed {
+            background: #d9f2e2;
+            color: #216e3a;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .status-default {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .actions form {
+            margin: 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 35px 15px;
+            color: #777;
+            line-height: 1.6;
+        }
+
+        .empty-state strong {
+            display: block;
+            color: #444;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .description-text {
+            color: #777;
+            font-size: 12px;
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1100px) {
+            .filter-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .filter-actions {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 18px;
+            }
+
+            .header h1 {
+                font-size: 21px;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .user-info {
+                text-align: left;
+            }
+
+            .container {
+                margin: 20px auto;
+                padding: 0 12px;
+            }
+
+            .section {
+                padding: 18px;
+            }
+
+            .form-grid,
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width {
+                grid-column: auto;
+            }
+
+            .filter-actions {
+                grid-column: auto;
+            }
+
+            .page-heading h2 {
+                font-size: 22px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" th:href="@{/css/app-theme.css}">
+</head>
+
+<body class="app-shell">
+<aside th:replace="~{fragments/sidebar :: sidebar('payments')}"></aside>
+
+<header class="header">
+    <div>
+        <h1>Project Track PH</h1>
+        <p>Budget and Financial Tracking System</p>
+    </div>
+
+    <div class="header-right">
+        <div class="user-info">
+            <strong th:text="${fullName != null ? fullName : 'User'}">User</strong>
+            <span th:text="${role != null ? role : 'Account'}">Role</span>
+        </div>
+
+    </div>
+</header>
+
+<main class="container">
+
+    <div class="page-heading">
+        <div>
+            <h2>Payment Management</h2>
+            <p>Add, view, search, filter, edit, and manage project payment records.</p>
+        </div>
+    </div>
+
+    <!-- Success and error messages -->
+    <div th:if="${successMessage}"
+         class="message success-message"
+         role="status"
+         th:text="${successMessage}">
+        Payment record added successfully.
+    </div>
+
+    <div th:if="${errorMessage}"
+         class="message error-message"
+         role="alert"
+         th:text="${errorMessage}">
+        Something went wrong.
+    </div>
+
+    <!-- Summary cards -->
+    <section class="summary-grid">
+
+        <div class="summary-card">
+            <h3>Total Payment Records</h3>
+            <div class="number" th:text="${totalPayments}">0</div>
+        </div>
+
+        <div class="summary-card">
+            <h3>Completed Payments</h3>
+            <div class="number" th:text="${completedPayments}">0</div>
+        </div>
+
+        <div class="summary-card">
+            <h3>Pending Payments</h3>
+            <div class="number" th:text="${pendingPayments}">0</div>
+        </div>
+
+    </section>
+
+    <!-- Add Payment -->
+    <section class="section">
+        <h3 class="section-title">Add Payment Record</h3>
+
+        <form th:action="@{/payments/add}" method="post">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="projectId">Project *</label>
+
+                    <select id="projectId" name="projectId" required>
+                        <option value="">-- Select Project --</option>
+
+                        <option th:each="project : ${projects}"
+                                th:value="${project.id}"
+                                th:text="${project.projectName}">
+                            Project Name
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Amount (₱) *</label>
+
+                    <input type="number"
+                           id="amount"
+                           name="amount"
+                           min="0.01"
+                           step="0.01"
+                           placeholder="Enter amount"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentDate">Payment Date *</label>
+
+                    <input type="date"
+                           id="paymentDate"
+                           name="paymentDate"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Method *</label>
+
+                    <select id="paymentMethod"
+                            name="paymentMethod"
+                            required>
+                        <option value="">-- Select Method --</option>
+                        <option value="CASH">Cash</option>
+                        <option value="BANK_TRANSFER">Bank Transfer</option>
+                        <option value="GCASH">GCash</option>
+                        <option value="CHECK">Check</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="referenceNumber">Reference Number</label>
+
+                    <input type="text"
+                           id="referenceNumber"
+                           name="referenceNumber"
+                           maxlength="100"
+                           placeholder="Optional reference number">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="description">Description</label>
+
+                    <textarea id="description"
+                              name="description"
+                              maxlength="500"
+                              placeholder="Enter payment details (optional)"></textarea>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    + Add Payment
+                </button>
+            </div>
+
+        </form>
+    </section>
+
+    <!-- Search and Filter -->
+    <section class="section">
+        <h3 class="section-title">Search and Filter Payments</h3>
+
+        <p class="filter-description">
+            Search by project name or reference number. You can also filter
+            records by payment status and payment method.
+        </p>
+
+        <form th:action="@{/payments}" method="get">
+
+            <div class="filter-grid">
+
+                <div class="form-group">
+                    <label for="keyword">Search</label>
+
+                    <input type="text"
+                           id="keyword"
+                           name="keyword"
+                           placeholder="Project name or reference number"
+                           th:value="${keyword}">
+                </div>
+
+                <div class="form-group">
+                    <label for="statusFilter">Payment Status</label>
+
+                    <select id="statusFilter" name="status">
+                        <option value="ALL"
+                                th:selected="${selectedStatus == 'ALL'}">
+                            All Statuses
+                        </option>
+
+                        <option value="PENDING"
+                                th:selected="${selectedStatus == 'PENDING'}">
+                            Pending
+                        </option>
+
+                        <option value="COMPLETED"
+                                th:selected="${selectedStatus == 'COMPLETED'}">
+                            Completed
+                        </option>
+
+                        <option value="CANCELLED"
+                                th:selected="${selectedStatus == 'CANCELLED'}">
+                            Cancelled
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="methodFilter">Payment Method</label>
+
+                    <select id="methodFilter" name="paymentMethod">
+                        <option value="ALL"
+                                th:selected="${selectedPaymentMethod == 'ALL'}">
+                            All Methods
+                        </option>
+
+                        <option value="CASH"
+                                th:selected="${selectedPaymentMethod == 'CASH'}">
+                            Cash
+                        </option>
+
+                        <option value="BANK_TRANSFER"
+                                th:selected="${selectedPaymentMethod == 'BANK_TRANSFER'}">
+                            Bank Transfer
+                        </option>
+
+                        <option value="GCASH"
+                                th:selected="${selectedPaymentMethod == 'GCASH'}">
+                            GCash
+                        </option>
+
+                        <option value="CHECK"
+                                th:selected="${selectedPaymentMethod == 'CHECK'}">
+                            Check
+                        </option>
+
+                        <option value="OTHER"
+                                th:selected="${selectedPaymentMethod == 'OTHER'}">
+                            Other
+                        </option>
+                    </select>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-search">
+                        Search
+                    </button>
+
+                    <a th:href="@{/payments}" class="btn btn-reset">
+                        Reset
+                    </a>
+                </div>
+
+            </div>
+        </form>
+    </section>
+
+    <!-- Payment Records -->
+    <section class="section">
+        <h3 class="section-title">Payment Records</h3>
+
+        <p class="results-info">
+            Showing
+            <strong th:text="${payments.size()}">0</strong>
+            matching payment record(s).
+        </p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Project</th>
+                    <th>Amount</th>
+                    <th>Payment Date</th>
+                    <th>Payment Method</th>
+                    <th>Reference Number</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr th:each="payment : ${payments}">
+
+                    <td th:text="${payment.id}">1</td>
+
+                    <td>
+                        <strong
+                            th:text="${payment.project != null ? payment.project.projectName : 'N/A'}">
+                            Project Name
+                        </strong>
+
+                        <div class="description-text"
+                             th:if="${payment.description != null and !#strings.isEmpty(payment.description)}"
+                             th:text="${payment.description}">
+                            Payment description
+                        </div>
+                    </td>
+
+                    <td>
+                        ₱<span th:text="${#numbers.formatDecimal(payment.amount, 1, 'COMMA', 2, 'POINT')}">
+                            0.00
+                        </span>
+                    </td>
+
+                    <td th:text="${payment.paymentDate != null ? #temporals.format(payment.paymentDate, 'MMM dd, yyyy') : 'N/A'}">
+                        Jan 01, 2026
+                    </td>
+
+                    <td th:text="${payment.paymentMethod != null ? #strings.replace(payment.paymentMethod, '_', ' ') : 'N/A'}">
+                        Cash
+                    </td>
+
+                    <td th:text="${payment.referenceNumber != null and !#strings.isEmpty(payment.referenceNumber) ? payment.referenceNumber : '—'}">
+                        —
+                    </td>
+
+                    <td>
+                        <span class="status"
+                              th:classappend="${payment.status != null and #strings.equalsIgnoreCase(payment.status, 'COMPLETED') ? ' status-completed' : (payment.status != null and #strings.equalsIgnoreCase(payment.status, 'PENDING') ? ' status-pending' : (payment.status != null and #strings.equalsIgnoreCase(payment.status, 'CANCELLED') ? ' status-cancelled' : ' status-default'))}"
+                              th:text="${payment.status != null ? payment.status : 'UNKNOWN'}">
+                            PENDING
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="actions">
+
+                            <a th:href="@{/payments/edit/{id}(id=${payment.id})}"
+                               class="btn btn-edit">
+                                Edit
+                            </a>
+
+                            <form th:action="@{/payments/delete/{id}(id=${payment.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Are you sure you want to delete this payment record?');">
+
+                                <button type="submit" class="btn btn-delete">
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </div>
+                    </td>
+
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(payments)}">
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <strong>No Payment Records Found</strong>
+                            No records match your search or selected filters.
+                            Try changing your filters or click Reset.
+                        </div>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="page-back-action">
+        <a th:href="@{/dashboard}" class="btn btn-back">Back to Dashboard</a>
+    </div>
+
+</main>
+
+</body>
+</html>

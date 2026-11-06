@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside class="app-sidebar" th:fragment="sidebar(activePage)">
+    <a class="app-brand" th:href="@{/dashboard}">Project Track PH</a>
+    <p class="app-subtitle">Budget and Financial Tracking System</p>
+
+    <div class="app-user-card">
+        <span>Logged in as:</span>
+        <strong th:text="${fullName != null ? fullName : 'User'}">User</strong>
+        <span th:text="${role != null ? role : 'Account'}">Account</span>
+    </div>
+
+    <nav class="app-nav" aria-label="Main navigation">
+        <a th:href="@{/dashboard}" th:classappend="${activePage == 'dashboard'} ? ' active' : ''">Dashboard</a>
+        <a th:href="@{/projects}" th:classappend="${activePage == 'projects'} ? ' active' : ''">Projects</a>
+        <a th:href="@{/transactions}" th:classappend="${activePage == 'transactions'} ? ' active' : ''">Transactions</a>
+        <a th:href="@{/payments}" th:classappend="${activePage == 'payments'} ? ' active' : ''">Payments</a>
+        <a th:href="@{/reports}" th:classappend="${activePage == 'reports'} ? ' active' : ''">Reports</a>
+        <a th:href="@{/logout}">Logout</a>
+    </nav>
+</aside>
+</body>
+</html>
